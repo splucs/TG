@@ -175,6 +175,9 @@ public:
 	bool Empty(int ver) {
 		return Size(root[ver]) == 0;
 	}
+	int LatestVersion() {
+		return int(root.size())-1;
+	}
 };
 
 /*

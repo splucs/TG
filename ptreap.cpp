@@ -28,7 +28,7 @@ private:
 		if (node == NULL) {
 			a = b = NULL;
 		}
-		else if(node->x < x) {
+		else if (node->x < x) {
 			Split(node->right, x, aux, b);
 			node->right = aux;
 			a = Refresh(node);
@@ -42,7 +42,7 @@ private:
 	Node* Merge(Node *a, Node *b) {
 		if (a == NULL) return b;
 		else if (b == NULL) return a;
-		if(a->y < b->y) {
+		if (a->y < b->y) {
 			a->right = Merge(a->right, b);
 			return Refresh(a);
 		}
@@ -52,15 +52,15 @@ private:
 		}
 	}
 	Node* Count(Node* node, int x) {
-		if(node == NULL) return NULL;
-		else if(x == node->x) return node;
-		else if(x < node->x) return Count(node->left, x);
+		if (node == NULL) return NULL;
+		else if (x == node->x) return node;
+		else if (x < node->x) return Count(node->left, x);
 		else return Count(node->right, x);
 	}
 	void Delete(Node *node) {
 		if (node == NULL) return;
-		if (node->left != NULL) Delete(node->left);
-		if (node->right != NULL) Delete(node->right);
+		Delete(node->left);
+		Delete(node->right);
 		delete node;
 	}
 public:
@@ -119,38 +119,26 @@ private:
 		Node *aux;
 		if (node == NULL) {
 			a = b = NULL;
-		}
-		else if(node->x < x) {
-			Split(node->right, x, aux, b);
-			node->right = aux;
-			a = Refresh(node);
-		}
-		else {
-			Split(node->left, x, a, aux);
-			node->left = aux;
-			b = Refresh(node);
-		}
-	}
-	Node *SplitCopy(Node *node, int x) {
-		if (node == NULL) {
-			return NULL;
+			return;
 		}
 		Node *copy = Newnode(node->x);
-		if(node->x < x) {
-			copy->right = SplitCopy(node->right, x);
-			copy->left = node->left;
-			return Refresh(copy);
+		copy->left = node->left;
+		copy->right = node->right;
+		if (copy->x < x) {
+			Split(copy->right, x, aux, b);
+			copy->right = aux;
+			a = Refresh(copy);
 		}
 		else {
-			copy->left = SplitCopy(node->left, x);
-			copy->right = node->right;
-			return Refresh(copy);
+			Split(copy->left, x, a, aux);
+			copy->left = aux;
+			b = Refresh(copy);
 		}
 	}
 	Node* Merge(Node* a, Node* b) {
 		if (a == NULL) return b;
 		else if (b == NULL) return a;
-		if(a->y < b->y) {
+		if (a->y < b->y) {
 			a->right = Merge(a->right, b);
 			return Refresh(a);
 		}
@@ -160,9 +148,9 @@ private:
 		}
 	}
 	Node* Count(Node* node, int x) {
-		if(node == NULL) return NULL;
-		else if(x == node->x) return node;
-		else if(x < node->x) return Count(node->left, x);
+		if (node == NULL) return NULL;
+		else if (x == node->x) return node;
+		else if (x < node->x) return Count(node->left, x);
 		else return Count(node->right, x);
 	}
 public:
@@ -181,19 +169,15 @@ public:
 	}
 	int Insert(int ver, int x) {
 		if (Count(root[ver], x) != NULL) return -1;
-		Node *copy = SplitCopy(root[ver], x);
 		Node *leftTree, *rightTree;
-		Split(copy, x, leftTree, rightTree);
-		copy = Merge(leftTree, Merge(Newnode(x), rightTree));
-		root.push_back(copy);
+		Split(root[ver], x, leftTree, rightTree);
+		root.push_back(Merge(leftTree, Merge(Newnode(x), rightTree)));
 		return int(root.size()) - 1;
 	}
 	int Erase(int ver, int x) {
 		Node *leftTree, *midRightTree, *mid, *rightTree;
-		Node *rootAux = SplitCopy(root[ver], x);
-		Split(rootAux, x, leftTree, midRightTree);
-		Node *midRightTreeAux = SplitCopy(midRightTree, x + 1);
-		Split(midRightTreeAux, x + 1, mid, rightTree);
+		Split(root[ver], x, leftTree, midRightTree);
+		Split(midRightTree, x + 1, mid, rightTree);
 		root.push_back(Merge(leftTree, rightTree));
 		return int(root.size()) - 1;
 	}
