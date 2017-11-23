@@ -71,20 +71,13 @@ public:
  * Persistent pointer segment tree
  */
 
-struct Node {
-	int data, low, high;
-	Node *left, *right;
-	Node(int _data, int _low, int _high) :
-		data(_data), low(_low), high(_high), left(NULL), right(NULL) { }
-};
-
 class PersistentSegmentTree {
 private:
 	std::vector<Node*> root;
 	std::vector<Node*> nodes;
 	int size;
-	Node *Newnode(int x) {
-		nodes.push_back(new Node(x));
+	Node *Newnode(int x, int low, int high) {
+		nodes.push_back(new Node(x, low, high));
 		return nodes.back();
 	}
 	Node *Build(int low, int high, const int arr[]) {
@@ -104,13 +97,11 @@ private:
 		int mid = (low + high) / 2;
 		if (i > high || i < low) return node;
 		Node *copy = Newnode(node->data, low, high);
-		if (low == high) {
-			copy->data = data;
-		}
+		if (low == high) copy->data = data;
 		else {
 			copy->left = Update(node->left, i, data);
 			copy->right = Update(node->right, i, data);
-			copy->data = node->right->data + node->left->data;
+			copy->data = copy->right->data + copy->left->data;
 		}
 		return copy;
 	}
@@ -130,7 +121,7 @@ private:
 public:
 	PersistentSegmentTree(const int *begin, const int *end) {
 		size = int(end-begin);
-		root = Build(0, size - 1, begin);
+		root.push_back(Build(0, size - 1, begin));
 	}
 	~PersistentSegmentTree() { 
 		for(int i = 0; i < (int)nodes.size(); i++) {
@@ -157,7 +148,7 @@ public:
 #include <ctime>
 #define NTESTS 10000
 #define NQUERY 10
-#define SIZE 100
+#define SIZE 1000
 #define RANGE 100
 
 int Sum(const std::vector<int> & arr, int i, int j) {
@@ -201,7 +192,7 @@ bool TestSegmentTree() {
 		}
 	}
 	printf("All normal segment tree tests passed.\n");
-	return 0;
+	return true;
 }
 
 bool TestPersistentSegmentTree() {
@@ -216,7 +207,7 @@ bool TestPersistentSegmentTree() {
 		int ver = rand()%test;
 		int i = rand()%SIZE;
 		int v = rand()%RANGE;
-		control[test] = control[ver]
+		control[test] = control[ver];
 		control[test][i] = v;
 		segTree.Update(ver, i, v);
 	}
@@ -242,7 +233,7 @@ bool TestPersistentSegmentTree() {
 		}
 	}
 	printf("All persistent segment tree tests passed.\n");
-	return 0;
+	return true;
 }
 
 int main() {
