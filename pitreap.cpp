@@ -6,10 +6,11 @@
  */
 
 struct Node {
-	int value, y, size, sum;
+	const int data, y;
+	int size, sum;
 	Node *left, *right;
-	Node(int _value) : 
-		value(_value), sum(_value), y(rand()), size(1), left(NULL), right(NULL) { }	
+	Node(int _data) : 
+		data(_data), sum(_data), y(rand()), size(1), left(NULL), right(NULL) { }	
 };
 
 class ImplicitTreap {
@@ -17,7 +18,7 @@ private:
 	Node *root;
 	Node *Refresh(Node *node) {
 		node->size = 1 + Size(node->left) + Size(node->right);
-		node->sum = node->value + Sum(node->left) + Sum(node->right);
+		node->sum = node->data + Sum(node->left) + Sum(node->right);
 		return node;
 	}
 	int Size(Node *node) {
@@ -77,7 +78,7 @@ public:
 		root = NULL;
 	}
 	int At(int i) {
-		return At(root, i)->value;
+		return At(root, i)->data;
 	}
 	void Insert(int i, int v) {
 		Node *leftTree, *rightTree;
@@ -122,7 +123,7 @@ private:
 	}
 	Node *Refresh(Node *node) {
 		node->size = 1 + Size(node->left) + Size(node->right);
-		node->sum = node->value + Sum(node->left) + Sum(node->right);
+		node->sum = node->data + Sum(node->left) + Sum(node->right);
 		return node;
 	}
 	int Size(Node *node) {
@@ -139,7 +140,7 @@ private:
 			a = b = NULL;
 			return;
 		}
-		Node *copy = Newnode(node->value);
+		Node *copy = Newnode(node->data);
 		copy->left = node->left;
 		copy->right = node->right;
 		if (Size(copy->left) < i) {
@@ -184,7 +185,7 @@ public:
 		root.push_back(NULL);
 	}
 	int At(int ver, int i) {
-		return At(root[ver], i)->value;
+		return At(root[ver], i)->data;
 	}
 	int Insert(int ver, int i, int v) {
 		Node *leftTree, *rightTree;

@@ -6,7 +6,8 @@
  */
 
 struct Node {
-	int x, y, size;
+	const int x, y;
+	int size;
 	Node *left, *right;
 	Node(int _x) : 
 		x(_x), y(rand()), size(1), left(NULL), right(NULL) { }	
