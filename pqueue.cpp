@@ -6,7 +6,7 @@
  */
 
 struct Node {
-	int data;
+	const int data;
 	Node *nxt;
 	Node(Node *_nxt, int _data) :
 		nxt(_nxt), data(_data) { }
@@ -21,9 +21,8 @@ public:
 		front(NULL), back(NULL), size(0) {}
 	~Queue() { Clear(); }
 	void Clear() {
-		Node *aux;
 		while(front != NULL) {
-			aux = front;
+			Node *aux = front;
 			front = front->nxt;
 			delete aux;
 		}
@@ -41,13 +40,8 @@ public:
 		if (front == NULL) back = NULL;
 	}
 	void Push(int data) {
-		if (front != NULL) {
-			back->nxt = new Node(NULL, data);
-			back = back->nxt;
-		}
-		else {
-			front = back = new Node(NULL, data);
-		}
+		if (front != NULL) back = back->nxt = new Node(NULL, data);
+		else front = back = new Node(NULL, data);
 		size++;
 	}
 	int Size() {
@@ -63,7 +57,7 @@ public:
  */
 
 struct PNode {
-	int data;
+	const int data;
 	std::vector<PNode*> par;
 	PNode(int _data) :
 		data(_data) { }
@@ -74,6 +68,25 @@ private:
 	std::vector<PNode*> back;
 	std::vector<int> size;
 	std::vector<PNode*> nodes;
+	PNode *Newnode(PNode *parent, int data) {
+		PNode *node = new PNode(data);
+		if (parent != NULL) {
+			node->par.push_back(parent);
+			for(int i = 1; i-1 < (int)node->par[i-1]->par.size(); i++) {
+				node->par.push_back(node->par[i-1]->par[i-1]);
+			}
+		}
+		nodes.push_back(node);
+		return node;
+	}
+	PNode *LevelAncestor(PNode *node, int jump) {
+		for(int i = 0; i < (int)node->par.size(); i++) {
+			if (jump & (1<<i)) {
+				node = node->par[i];
+			}
+		}
+		return node;
+	}
 public:
 	PersistentQueue() {
 		back.push_back(NULL);
@@ -89,13 +102,7 @@ public:
 		nodes.clear();
 	}
 	int Front(int ver) {
-		PNode *front = back[ver];
-		unsigned long long jump = size[ver]-1;
-		for(int i = 0; i < (int)front->par.size(); i++) {
-			if (jump & (1ULL<<i)) {
-				front = front->par[i];
-			}
-		}
+		PNode *front = LevelAncestor(back[ver], size[ver]-1);
 		return front->data;
 	}
 	int Pop(int ver) {
@@ -104,16 +111,8 @@ public:
 		return int(back.size())-1;
 	}
 	int Push(int ver, int data) {
-		PNode *aux = new PNode(data);
-		if (back[ver] != NULL) {
-			aux->par.push_back(back[ver]);
-			for(int i = 1; i-1 < (int)aux->par[i-1]->par.size(); i++) {
-				aux->par.push_back(aux->par[i-1]->par[i-1]);
-			}
-		}
-		back.push_back(aux);
+		back.push_back(Newnode(back[ver], data));
 		size.push_back(size[ver] + 1);
-		nodes.push_back(aux);
 		return int(back.size()) - 1;
 	}
 	int Size(int ver) {
@@ -168,7 +167,7 @@ bool TestNormalQueue() {
 		int data1 = control.front();
 		int data2 = que.Front();
 		if (data1 != data2) {
-			printf("failed on closing loop %d\n");
+			printf("failed on closing loop %d-%d\n", data1, data2);
 			return false;
 		}
 		control.pop();

@@ -208,6 +208,13 @@ public:
 		int sum = Sum(midTree);
 		return sum;
 	}
+	int Concat(int ver1, int ver2) {
+		Node *leftTree, *rightTree, *aux;
+		Split(root[ver1], Size(root[ver1]), leftTree, aux);
+		Split(root[ver2], 0, aux, rightTree);
+		root.push_back(Merge(leftTree, rightTree));
+		return int(root.size()) - 1;
+	}
 	int Size(int ver) {
 		return Size(root[ver]);
 	}
@@ -227,6 +234,7 @@ public:
 #include <algorithm>
 #include <ctime>
 #define NTESTS 10000
+#define MAXSIZE 10000
 #define NQUERY 10
 #define RANGE 100
 
@@ -252,10 +260,10 @@ bool TestNormalTreap() {
 	std::vector<int> control;
 	ImplicitTreap treap;
 	for(int test = 1; test <= NTESTS; test++) {
-		int v = rand()%RANGE;
+		int data = rand()%RANGE;
 		int i = rand()%int(control.size()+1);
-		Insert(control, i, v);
-		treap.Insert(i, v);
+		Insert(control, i, data);
+		treap.Insert(i, data);
 		if (test%5 == 0) {
 			i = rand()%int(control.size());
 			Erase(control, i);
@@ -293,13 +301,16 @@ bool TestPersistentTreap() {
 	for(int test = 1; test < NTESTS; test++) {
 		int ver = rand()%test;
 		control[test] = control[ver];
-		if (test%5 != 0 || true) {
-			int v = rand()%RANGE;
-			int i = rand()%int(control[test].size()+1);
-			Insert(control[test], i, v);
-			treap.Insert(ver, i, v);
+		if (test%5 == 4) {
+			int ver2 = rand()%test;
+			if (control[ver].size() + control[ver2].size() > MAXSIZE) {
+				test--;
+				continue;
+			}
+			control[test].insert(control[test].end(), control[ver2].begin(), control[ver2].end());
+			treap.Concat(ver, ver2);
 		}
-		else {
+		else if (test%5 == 3){
 			if (control[test].empty()) {
 				test--;
 				continue;
@@ -307,6 +318,12 @@ bool TestPersistentTreap() {
 			int i = rand()%int(control[test].size());
 			Erase(control[test], i);
 			treap.Erase(ver, i);
+		}
+		else  {
+			int data = rand()%RANGE;
+			int i = rand()%int(control[test].size()+1);
+			Insert(control[test], i, data);
+			treap.Insert(ver, i, data);
 		}
 	}
 	for(int test = 0; test < NTESTS; test++) {

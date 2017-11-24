@@ -168,9 +168,9 @@ bool TestSegmentTree() {
 	SegmentTree segTree(&control[0], (&control[0])+SIZE);
 	for(int test = 1; test <= NTESTS; test++) {
 		int i = rand()%SIZE;
-		int v = rand()%RANGE;
-		control[i] = v;
-		segTree.Update(i, v);
+		int data = rand()%RANGE;
+		control[i] = data;
+		segTree.Update(i, data);
 		for(int i = 0; i < SIZE; i++) {
 			int value1 = control[i];
 			int value2 = segTree.Query(i, i);
@@ -206,10 +206,10 @@ bool TestPersistentSegmentTree() {
 	for(int test = 1; test <= NTESTS; test++) {
 		int ver = rand()%test;
 		int i = rand()%SIZE;
-		int v = rand()%RANGE;
+		int data = rand()%RANGE;
 		control[test] = control[ver];
-		control[test][i] = v;
-		segTree.Update(ver, i, v);
+		control[test][i] = data;
+		segTree.Update(ver, i, data);
 	}
 	for(int test = 0; test < NTESTS; test++) {
 		for(int i = 0; i < SIZE; i++) {
